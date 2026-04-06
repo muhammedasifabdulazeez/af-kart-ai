@@ -8,18 +8,18 @@ app = Flask(__name__)
 app.secret_key = "secret123"
 
 # DB CONNECTION
-import sqlite3
-
 db = sqlite3.connect('database.db', check_same_thread=False)
 cursor = db.cursor()
 
-# Create table if not exists
-import sqlite3
+# CREATE TABLES
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT
+)
+""")
 
-db = sqlite3.connect('database.db', check_same_thread=False)
-cursor = db.cursor()
-
-# Create table if not exists
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS reviews (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,54 +54,48 @@ def login():
     return render_template("login.html")
 
 # REGISTER
-@app.route("/register", methods=["POST"])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    user = request.form["username"]
-    pwd = request.form["password"]
+    if request.method == 'POST':
+        user = request.form['username']
+        pwd = request.form['password']
 
-    hashed_pwd = generate_password_hash(pwd)
+        hashed_pwd = generate_password_hash(pwd)
 
-    cursor.execute("INSERT INTO users(username,password) VALUES(?,?)", (user, hashed_pwd))
-    db.commit()
+        try:
+            cursor.execute("INSERT INTO users(username, password) VALUES (?, ?)", (user, hashed_pwd))
+            db.commit()
+            return redirect('/')
+        except Exception as e:
+            return str(e)
 
-    flash("Registration successful! Please login.")
-    return redirect("/")
+    return render_template('register.html')
 
 # DASHBOARD
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if request.method == 'POST':
         product = request.form['product']
-        review = request.form['review']
-        review = review.lower().strip()
-        rating = int(request.form['rating'])   # ⭐ FIXED
+        review = request.form['review'].lower().strip()
+        rating = int(request.form['rating'])
 
-        # Convert review using vectorizer
         review_vector = vectorizer.transform([review])
-
-        # Predict sentiment
         prediction = model.predict(review_vector)[0]
 
-        # Insert into DB (WITH rating)
         cursor.execute(
             "INSERT INTO reviews(product, review, sentiment, rating) VALUES(?,?,?,?)",
             (product, review, prediction, rating)
         )
         db.commit()
 
-    # Fetch all reviews
     cursor.execute("SELECT * FROM reviews")
     reviews = cursor.fetchall()
-    # Count sentiments
+
     cursor.execute("SELECT sentiment, COUNT(*) FROM reviews GROUP BY sentiment")
     data = cursor.fetchall()
 
-    labels = []
-    values = []
-
-    for row in data:
-        labels.append(row[0])
-        values.append(row[1])
+    labels = [row[0] for row in data]
+    values = [row[1] for row in data]
 
     return render_template("dashboard.html", reviews=reviews, labels=labels, values=values)
 
@@ -114,4 +108,3 @@ def logout():
 # RUN APP
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-    
