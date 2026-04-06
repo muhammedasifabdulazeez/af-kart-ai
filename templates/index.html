@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>N-Cart AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    display:flex;
+    background:#f5f7fb;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:250px;
+    height:100vh;
+    background:#0f172a;
+    color:white;
+    padding:20px;
+}
+
+.sidebar h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.sidebar .user{
+    background:#1e293b;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    padding:20px;
+}
+
+/* PRODUCTS */
+.products{
+    display:flex;
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    width:250px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    text-align:center;
+}
+
+.card h3{
+    margin:10px 0;
+}
+
+.card button{
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    background:#facc15;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* REVIEW BOX */
+.review-box{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+textarea{
+    width:100%;
+    height:100px;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    margin-top:10px;
+}
+
+button.submit{
+    margin-top:10px;
+    padding:10px;
+    background:#22c55e;
+    color:white;
+    border:none;
+    border-radius:10px;
+}
+
+/* RESULT */
+.result{
+    margin-top:15px;
+    font-weight:bold;
+}
+
+.positive{color:green;}
+.negative{color:red;}
+.neutral{color:orange;}
+
+.review-item{
+    background:#f1f5f9;
+    padding:10px;
+    margin-top:10px;
+    border-radius:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>🛒 N-Cart AI</h2>
+
+    <div class="user">
+        Logged in as <br>
+        <b>Fatima</b>
+    </div>
+
+    <p>📊 Dashboard</p>
+    <p>📝 Reviews</p>
+    <p>⚙ Settings</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <h2>Select Product</h2>
+
+    <div class="products">
+        <div class="card">
+            <h3>Headphones</h3>
+            <p>₹2,499</p>
+            <button onclick="selectProduct('Headphones')">Select</button>
+        </div>
+
+        <div class="card">
+            <h3>Phone</h3>
+            <p>₹18,999</p>
+            <button onclick="selectProduct('Phone')">Select</button>
+        </div>
+
+        <div class="card">
+            <h3>Laptop</h3>
+            <p>₹52,499</p>
+            <button onclick="selectProduct('Laptop')">Select</button>
+        </div>
+    </div>
+
+    <!-- REVIEW -->
+    <div class="review-box">
+        <h3 id="productTitle">Select a product</h3>
+
+        <form method="POST">
+            <textarea name="review" placeholder="Write your review..."></textarea>
+            <button class="submit">Analyze</button>
+        </form>
+
+        {% if prediction %}
+        <div class="result 
+            {% if prediction == 'positive' %}positive
+            {% elif prediction == 'negative' %}negative
+            {% else %}neutral{% endif %}">
+            
+            {% if prediction == 'positive' %}
+                😊 Positive
+            {% elif prediction == 'negative' %}
+                😡 Negative
+            {% else %}
+                😐 Neutral
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- SAMPLE REVIEWS -->
+        <div class="review-item">⭐ Good product</div>
+        <div class="review-item">⭐ Bad quality</div>
+
+    </div>
+
+</div>
+
+<script>
+function selectProduct(name){
+    document.getElementById("productTitle").innerText = "Review for " + name;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+review,sentiment
+this product is amazing,positive
+excellent quality,positive
+i love this product,positive
+very good item,positive
+superb performance,positive
+nice product,positive
+
+bad experience,negative
+very bad quality,negative
+worst purchase ever,negative
+poor performance,negative
+not good,negative
+terrible service,negative
+waste of money,negative
