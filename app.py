@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, flash
 import sqlite3
+import os
 import pickle
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -112,4 +113,5 @@ def logout():
 
 # RUN APP
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    
