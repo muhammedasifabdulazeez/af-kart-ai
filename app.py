@@ -63,9 +63,18 @@ def register():
         hashed_pwd = generate_password_hash(pwd)
 
         try:
+            # CHECK IF USER EXISTS
+            cursor.execute("SELECT * FROM users WHERE username=?", (user,))
+            existing = cursor.fetchone()
+
+            if existing:
+                return "Username already exists ❗"
+
             cursor.execute("INSERT INTO users(username, password) VALUES (?, ?)", (user, hashed_pwd))
             db.commit()
+
             return redirect('/')
+
         except Exception as e:
             return str(e)
 
