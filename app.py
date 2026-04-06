@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, flash
-import mysql.connector
+import sqlite3
 import pickle
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -7,14 +7,28 @@ app = Flask(__name__)
 app.secret_key = "secret123"
 
 # DB CONNECTION
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="asifasif@123",  # your mysql password
-    database="sentiment_db2"
-)
+import sqlite3
 
-cursor = db.cursor(buffered=True)
+db = sqlite3.connect('database.db', check_same_thread=False)
+cursor = db.cursor()
+
+# Create table if not exists
+import sqlite3
+
+db = sqlite3.connect('database.db', check_same_thread=False)
+cursor = db.cursor()
+
+# Create table if not exists
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product TEXT,
+    review TEXT,
+    sentiment TEXT,
+    rating INTEGER
+)
+''')
+db.commit()
 
 # LOAD MODEL
 model = pickle.load(open("model.pkl", "rb"))
@@ -69,7 +83,7 @@ def dashboard():
 
         # Insert into DB (WITH rating)
         cursor.execute(
-            "INSERT INTO reviews(product, review, sentiment, rating) VALUES(%s,%s,%s,%s)",
+            "INSERT INTO reviews(product, review, sentiment, rating) VALUES(?,?,?,?)",
             (product, review, prediction, rating)
         )
         db.commit()
