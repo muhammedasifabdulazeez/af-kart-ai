@@ -20,7 +20,7 @@ db = sqlite3.connect('database.db', check_same_thread=False)
 cursor = db.cursor()
 
 # Create table if not exists
-cursor.execute('''
+cursor.execute("""
 CREATE TABLE IF NOT EXISTS reviews (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     product TEXT,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     sentiment TEXT,
     rating INTEGER
 )
-''')
+""")
 db.commit()
 
 # LOAD MODEL
