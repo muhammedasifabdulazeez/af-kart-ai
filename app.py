@@ -42,7 +42,7 @@ def login():
         user = request.form["username"]
         pwd = request.form["password"]
 
-        cursor.execute("SELECT * FROM users WHERE username=%s", (user,))
+        cursor.execute("SELECT * FROM users WHERE username=?", (user,))
         result = cursor.fetchone()
 
         if result and check_password_hash(result[2], pwd):
@@ -61,7 +61,7 @@ def register():
 
     hashed_pwd = generate_password_hash(pwd)
 
-    cursor.execute("INSERT INTO users(username,password) VALUES(%s,%s)", (user, hashed_pwd))
+    cursor.execute("INSERT INTO users(username,password) VALUES(?,?)", (user, hashed_pwd))
     db.commit()
 
     flash("Registration successful! Please login.")
