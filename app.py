@@ -3,6 +3,7 @@ import sqlite3
 import os
 import pickle
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, redirect, flash
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -54,6 +55,8 @@ def login():
     return render_template("login.html")
 
 # REGISTER
+from flask import flash, redirect
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -62,23 +65,22 @@ def register():
 
         hashed_pwd = generate_password_hash(pwd)
 
-        try:
-            # CHECK IF USER EXISTS
-            cursor.execute("SELECT * FROM users WHERE username=?", (user,))
-            existing = cursor.fetchone()
+        # CHECK IF USER EXISTS
+        cursor.execute("SELECT * FROM users WHERE username=?", (user,))
+        existing = cursor.fetchone()
 
-            if existing:
-                return "Username already exists ❗"
-
-            cursor.execute("INSERT INTO users(username, password) VALUES (?, ?)", (user, hashed_pwd))
-            db.commit()
-
+        if existing:
+            flash("User already exists! Please login.")
             return redirect('/')
 
-        except Exception as e:
-            return str(e)
+        # INSERT NEW USER
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (user, hashed_pwd))
+        db.commit()
 
-    return render_template('register.html')
+        flash("Account created successfully! Please login.")  # ✅ THIS IS WHAT YOU NEED
+        return redirect('/')   # go to login page
+
+    return render_template("login.html")
 
 # DASHBOARD
 @app.route('/dashboard', methods=['GET', 'POST'])
